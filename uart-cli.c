@@ -184,7 +184,8 @@ static void cli_handle_line(cli_state_t *st, const char *line)
         printf("(empty command)\n");
         return;
     }
-
+ /*  part 5 complete */ 
+		
     else if (strcmp(line, "led on") == 0) {
 		st->mode = LED_MODE_ON;
 		st->led_level = 1;
