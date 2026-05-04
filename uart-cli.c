@@ -55,15 +55,18 @@ static void led_init(void)
  */
 static void led_set_raw(int on)
 {
-
 	// This method needs to check if the led is on every time it is called
 	// (i.e., make a comparison) and then turn on/off depending on its state.
 
 	// Methods you need to use: led_strip_set_pixel(), led_strip_refresh and led_strip_clear().
 	// Variables:  a refrence to the led strip (i.e., the led) and the pointer to the led on/off step.
+	if (on) {
+        led_strip_set_pixel(led_strip, 0, 255, 255, 255);
+        led_strip_refresh(led_strip);
+    } else {
+        led_strip_clear(led_strip);
+    }
 
-
-	// YOUR CODE GOES HERE
 }
 
 
