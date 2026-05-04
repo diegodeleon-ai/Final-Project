@@ -182,11 +182,19 @@ static void cli_handle_line(cli_state_t *st, const char *line)
         return;
     }
 
-    // TODO: M3 - Implement exact command matching for:
-    //       "help", "led on", "led off", "status", "about"
+    else if (strcmp(line, "led on") == 0) {
+		st->mode = LED_MODE_ON;
+		st->led_level = 1;
+		printf("LED turned on\n");
+		return;
+	}
     
-    // TODO: M4 - Implement parameter parsing for:
-    //       "blink <ms>" (hint: use strncmp, skip whitespace, use atoi)
+    else if (strcmp(line, "led off") == 0) {
+		st->mode = LED_MODE_OFF;
+		st->led_level = 0;
+		printf("LED turned off\n");
+		return;
+	}
     
     // If no command matched, print error message
     printf("Unknown command: '%s'\n", line);
