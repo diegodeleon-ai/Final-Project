@@ -55,18 +55,12 @@ static void led_init(void)
  */
 static void led_set_raw(int on)
 {
-	// This method needs to check if the led is on every time it is called
-	// (i.e., make a comparison) and then turn on/off depending on its state.
-
-	// Methods you need to use: led_strip_set_pixel(), led_strip_refresh and led_strip_clear().
-	// Variables:  a refrence to the led strip (i.e., the led) and the pointer to the led on/off step.
-	if (on) {
+    if (on) {
         led_strip_set_pixel(led_strip, 0, 255, 255, 255);
         led_strip_refresh(led_strip);
     } else {
         led_strip_clear(led_strip);
     }
-
 }
 
 
@@ -95,112 +89,76 @@ static void uart_init(void)
  * M2: Read a line from UART (blocking), storing at most len-1 chars.
  * The line should be terminated by '\n' and the buffer by '\0'.
  *
- * This function is already implemented for you.
+ * YOUR PART — COMPLETED
  */
 
 static int read_line(char *buf, int len)
 {
+    int pos = 0;
+    uint8_t ch;
 
-/*
+    while (pos < len - 1) {
 
+        // Read ONE byte from UART, block forever
+        int n = uart_read_bytes(UART_PORT, &ch, 1, portMAX_DELAY);
 
-M2: Convert this pseudocode to C:
+        // If nothing was read, continue
+        if (n <= 0) {
+            continue;
+        }
 
-    position = 0
+        // Echo the character back to the terminal
+        uart_write_bytes(UART_PORT, (const char *)&ch, 1);
 
-    WHILE position < max_length - 1 DO
-		NOTE: read_one_byte_from_uart is a esp driver, it goes exactly in that place
+        // Stop on newline or carriage return
+        if (ch == '\n' || ch == '\r') {
+            break;
+        }
 
-        character = read_one_byte_from_uart(wait_indefinitely)
-    
-        IF nothing_was_read THEN
-            continue_to_next_iteration
-        END IF
-    
-        // Echo back the character
-        write_character_to_uart(character)
-    
-        IF character == '\r' OR character == '\n' THEN
-            break_from_loop
-        END IF
-    
-        buffer[position] = character
-        position = position + 1
-    END WHILE
+        // Store the character
+        buf[pos++] = ch;
+    }
 
-buffer[position] = '\0'  // Null terminate the string
-RETURN position
-*/
+    // Null terminate the string
+    buf[pos] = '\0';
+
+    return pos;
 }
 
 // =========================
 //   CLI logic (M3/M4)
 // =========================
 
-/*
- * M3: TODO - Print the help text showing all available commands.
- * 
- * Commands to document:
- *   - help: show the help menu
- *   - led on: turn LED on
- *   - led off: turn LED off
- *   - blink <ms>: blink LED with period <ms>
- *   - status: show current LED state
- *   - about: show information about your team/project
- * 
- */
 static void cli_print_help(void)
 {
-    // TODO: Implement this function
     printf("TODO: Print help menu here\n");
 }
 
-/*
- * M3/M4: TODO - Parse a command line and update the CLI state accordingly.
- *
- * This is the main command parser. You should implement:
- *
- *   - "help": call cli_print_help()
- *   - "led on": set st->mode to LED_MODE_ON
- *   - "led off": set st->mode to LED_MODE_OFF
- *   - "status": print current LED mode (OFF/ON/BLINK) and blink period if applicable
- *   - "about": print your name and student ID
- *
- * M4 - Commands with parameters:
- *    - "blink <ms>": parse the number after "blink", validate it (50-5000 ms),
- *     and set st->mode to LED_MODE_BLINK with st->blink_ms = parsed value
- *
- */
-
 static void cli_handle_line(cli_state_t *st, const char *line)
 {
-    // Trim leading spaces (already done for you)
     while (*line == ' ') {
         line++;
     }
 
-    // Handle empty input
     if (*line == '\0') {
         printf("(empty command)\n");
         return;
     }
- /*  part 5 complete */ 
-		
+
     else if (strcmp(line, "led on") == 0) {
-		st->mode = LED_MODE_ON;
-		st->led_level = 1;
-		printf("LED turned on\n");
-		return;
-	}
+        st->mode = LED_MODE_ON;
+        st->led_level = 1;
+        printf("LED turned on\n");
+        return;
+    }
     
     else if (strcmp(line, "led off") == 0) {
-		st->mode = LED_MODE_OFF;
-		st->led_level = 0;
-		printf("LED turned off\n");
-		return;
-	}
+        st->mode = LED_MODE_OFF;
+        st->led_level = 0;
+        printf("LED turned off\n");
+        return;
+    }
     
-    // If no command matched, print error message
     printf("Unknown command: '%s'\n", line);
     printf("Type 'help' for a list of commands.\n");
 }
@@ -211,18 +169,16 @@ static void cli_handle_line(cli_state_t *st, const char *line)
 
 void app_main(void)
 {
-    // Initialize hardware (already done for you)
     led_init();
     uart_init();
 
-    // Initialize CLI state
     cli_state_t st = {
         .mode = LED_MODE_OFF,
         .blink_ms = 500,
         .led_level = 0,
     };
 
-    led_set_raw(0);  // Start with LED off
+    led_set_raw(0);
 
     printf("\n=================================\n");
     printf("ESP32-C3 UART CLI ready!\n");
@@ -233,7 +189,6 @@ void app_main(void)
     TickType_t last_blink = xTaskGetTickCount();
 
     while (1) {
-        // M2/M3: Get a line from UART
         printf("> ");
         fflush(stdout);
 
@@ -244,8 +199,6 @@ void app_main(void)
             cli_handle_line(&st, line);
         }
 
-        // M4: Handle LED blinking (already implemented for you)
-        // This code runs continuously to update the LED state
         if (st.mode == LED_MODE_BLINK) {
             TickType_t now = xTaskGetTickCount();
             if ((now - last_blink) >= pdMS_TO_TICKS(st.blink_ms)) {
