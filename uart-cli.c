@@ -6,7 +6,7 @@
 #include "driver/uart.h"
 #include "led_strip.h"
 #include "esp_log.h"
-
+#include <stdlib.h> //needed due to atoi() - Sofia
 // =========================
 //   Hardware definitions
 // =========================
@@ -152,7 +152,14 @@ RETURN position
 static void cli_print_help(void)
 {
     // TODO: Implement this function
-    printf("TODO: Print help menu here\n");
+  /* Part 3 Complete */
+    printf("Available commands:\n");
+    printf("  help         - Show this help menu\n");
+    printf("  led on       - Turn the LED on\n");
+    printf("  led off      - Turn the LED off\n");
+    printf("  blink <ms>   - Blink LED with period in ms (50-5000)\n");
+    printf("  status       - Show current LED state\n");
+    printf("  about        - Show project/team info\n");
 }
 
 /*
@@ -184,21 +191,57 @@ static void cli_handle_line(cli_state_t *st, const char *line)
         printf("(empty command)\n");
         return;
     }
+    /* part 3  complete */
+    if (strcmp(line, "help") == 0) {
+        cli_print_help();
+        return;
+    }
+
+    if (strcmp(line, "status") == 0) {
+        if (st->mode == LED_MODE_OFF) {
+            printf("LED is OFF\n");
+        } else if (st->mode == LED_MODE_ON) {
+            printf("LED is ON\n");
+        } else if (st->mode == LED_MODE_BLINK) {
+            printf("LED is BLINKING at %d ms\n", st->blink_ms);
+        }
+        return;
+    }
+
+    if (strcmp(line, "about") == 0) {
+        printf("UART-CLI Final Project\n");
+        printf("Team: [your team names here]\n");
+        printf("UTEP - Computer Organization 2026\n");
+        return;
+    }
+
+    if (strncmp(line, "blink ", 6) == 0) {
+        int ms = atoi(line + 6);
+        if (ms < 50 || ms > 5000) {
+            printf("Error: blink period must be between 50 and 5000 ms\n");
+        } else {
+            st->mode = LED_MODE_BLINK;
+            st->blink_ms = ms;
+            printf("Blinking at %d ms\n", ms);
+        }
+        return;
+    }
+
  /*  part 5 complete */ 
 		
-    else if (strcmp(line, "led on") == 0) {
+    if (strcmp(line, "led on") == 0) {
 		st->mode = LED_MODE_ON;
 		st->led_level = 1;
 		printf("LED turned on\n");
 		return;
-	}
+    }
     
-    else if (strcmp(line, "led off") == 0) {
+    if (strcmp(line, "led off") == 0) {
 		st->mode = LED_MODE_OFF;
 		st->led_level = 0;
 		printf("LED turned off\n");
 		return;
-	}
+    }
     
     // If no command matched, print error message
     printf("Unknown command: '%s'\n", line);
