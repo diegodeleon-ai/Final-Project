@@ -211,7 +211,7 @@ static void cli_handle_line(cli_state_t *st, const char *line)
 
     if (strcmp(line, "about") == 0) {
         printf("UART-CLI Final Project\n");
-        printf("Team: Diego de Leon, \n");
+        printf("Team: Diego de Leon, Arturo Valles, Brandon Hernandez,  \n");
         printf("UTEP - Computer Organization 2026\n");
         return;
     }
