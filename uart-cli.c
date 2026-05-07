@@ -52,6 +52,7 @@ static void led_init(void)
 /*
  * Set LED to on/off.
  * M1: TODO
+ Part 1: Diego
  */
 static void led_set_raw(int on)
 {
