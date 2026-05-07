@@ -216,17 +216,25 @@ static void cli_handle_line(cli_state_t *st, const char *line)
         return;
     }
 
-    if (strncmp(line, "blink ", 6) == 0) {
-        int ms = atoi(line + 6);
-        if (ms < 50 || ms > 5000) {
-            printf("Error: blink period must be between 50 and 5000 ms\n");
-        } else {
-            st->mode = LED_MODE_BLINK;
-            st->blink_ms = ms;
-            printf("Blinking at %d ms\n", ms);
+    /* Ziggy Z - Part 6 Complete */
+
+    if(strncmp(line, "blink ", 6) == 0){
+        int ms;
+        ms = atoi(line + 6);
+
+        if(ms < 50 || ms > 5000){
+            printf("Please use a number from 50 to 5000\n");
+            return;
         }
+
+        st->mode = LED_MODE_BLINK;
+        st->blink_ms = ms;
+        printf("Blink is set to %d ms\n", ms);
+        
         return;
     }
+
+
 
  /*  part 5 complete */ 
 		
