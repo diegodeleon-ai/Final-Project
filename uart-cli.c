@@ -56,18 +56,12 @@ static void led_init(void)
  */
 static void led_set_raw(int on)
 {
-	// This method needs to check if the led is on every time it is called
-	// (i.e., make a comparison) and then turn on/off depending on its state.
-
-	// Methods you need to use: led_strip_set_pixel(), led_strip_refresh and led_strip_clear().
-	// Variables:  a refrence to the led strip (i.e., the led) and the pointer to the led on/off step.
-	if (on) {
+    if (on) {
         led_strip_set_pixel(led_strip, 0, 255, 255, 255);
         led_strip_refresh(led_strip);
     } else {
         led_strip_clear(led_strip);
     }
-
 }
 
 
@@ -96,42 +90,39 @@ static void uart_init(void)
  * M2: Read a line from UART (blocking), storing at most len-1 chars.
  * The line should be terminated by '\n' and the buffer by '\0'.
  *
- * This function is already implemented for you.
+ * YOUR PART — COMPLETED (John)
  */
-
 static int read_line(char *buf, int len)
 {
+    int pos = 0;
+    uint8_t ch;
 
-/*
+    while (pos < len - 1) {
 
+        // Read ONE byte from UART, block forever
+        int n = uart_read_bytes(UART_PORT, &ch, 1, portMAX_DELAY);
 
-M2: Convert this pseudocode to C:
+        // If nothing was read, continue
+        if (n <= 0) {
+            continue;
+        }
 
-    position = 0
+        // Echo the character back to the terminal
+        uart_write_bytes(UART_PORT, (const char *)&ch, 1);
 
-    WHILE position < max_length - 1 DO
-		NOTE: read_one_byte_from_uart is a esp driver, it goes exactly in that place
+        // Stop on newline or carriage return
+        if (ch == '\n' || ch == '\r') {
+            break;
+        }
 
-        character = read_one_byte_from_uart(wait_indefinitely)
-    
-        IF nothing_was_read THEN
-            continue_to_next_iteration
-        END IF
-    
-        // Echo back the character
-        write_character_to_uart(character)
-    
-        IF character == '\r' OR character == '\n' THEN
-            break_from_loop
-        END IF
-    
-        buffer[position] = character
-        position = position + 1
-    END WHILE
+        // Store the character
+        buf[pos++] = ch;
+    }
 
-buffer[position] = '\0'  // Null terminate the string
-RETURN position
-*/
+    // Null terminate the string
+    buf[pos] = '\0';
+
+    return pos;
 }
 
 // =========================
@@ -231,17 +222,17 @@ static void cli_handle_line(cli_state_t *st, const char *line)
  /*  part 5 complete */ 
 		
     if (strcmp(line, "led on") == 0) {
-		st->mode = LED_MODE_ON;
-		st->led_level = 1;
-		printf("LED turned on\n");
-		return;
+        st->mode = LED_MODE_ON;
+        st->led_level = 1;
+        printf("LED turned on\n");
+        return;
     }
     
     if (strcmp(line, "led off") == 0) {
-		st->mode = LED_MODE_OFF;
-		st->led_level = 0;
-		printf("LED turned off\n");
-		return;
+        st->mode = LED_MODE_OFF;
+        st->led_level = 0;
+        printf("LED turned off\n");
+        return;
     }
     
     // If no command matched, print error message
