@@ -144,7 +144,7 @@ static int read_line(char *buf, int len)
 static void cli_print_help(void)
 {
     // TODO: Implement this function
-  /* Part 3 Complete */
+  /* Part 3 Complete - Sofia*/
     printf("Available commands:\n");
     printf("  help         - Show this help menu\n");
     printf("  led on       - Turn the LED on\n");
@@ -183,7 +183,7 @@ static void cli_handle_line(cli_state_t *st, const char *line)
         printf("(empty command)\n");
         return;
     }
-    /* part 3  complete */
+    /* part 3  complete -Sofia */
     if (strcmp(line, "help") == 0) {
         cli_print_help();
         return;
